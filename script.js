@@ -6,20 +6,18 @@ $(document).ready(() => {
     const recognition = new SpeechRecognition();
     const speechRecognitionList = new SpeechGrammarList();
     recognition.lang = 'en-US';
+    recognition.continuous = true;
 
-    alert("hello");
-    alert(recognition.lang);
     $(".thebutton").click(change);
 
     function change() {
         recognition.start();
-    }
-
-    recognition.onspeechend = function() {
-        recognition.stop();
-    }
+    } 
 
     recognition.onresult = function(event) {
-        $(".memes").text(event.results);
-    }
+        const life = event.results[0][0]["transcript"];
+        $(".memes").text(life);
+        recognition.stop();
+    } 
+
 });
