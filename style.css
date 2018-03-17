@@ -1,0 +1,11 @@
+tr {
+    border: 0px;
+    border-spacing: 0px;
+}
+
+td {
+    border: 1px solid #000;
+    padding: 0px;
+    height: 10em;
+    width: 10em;
+}

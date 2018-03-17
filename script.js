@@ -8,16 +8,15 @@ $(document).ready(() => {
     recognition.lang = 'en-US';
     recognition.continuous = true;
 
-    $(".thebutton").click(change);
+    $("button").click(change);
 
     function change() {
         recognition.start();
     } 
 
     recognition.onresult = function(event) {
-        const life = event.results[0][0]["transcript"];
-        $(".memes").text(life);
+        const text = event.results[0][0]["transcript"];
+        $(".text").text("You said: " + text);
         recognition.stop();
     } 
-
 });
