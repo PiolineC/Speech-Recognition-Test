@@ -21,11 +21,26 @@ $(document).ready(() => {
         recognition.stop(); 
         const text = event.results[0][0]['transcript'];
         $('.input').text('You said: ' + text);         
-        parse(text);        
+        const success = parse(text);          
+        const victor = checkVictory();
+
+        //if a winner is declared, end the game
+        if (victor) { 
+            $('.turn').text(victor + ' wins!');
+            $('button').text(victor + ' wins!');
+        //if there is no winner, but the input was parsed, continue
+        } else if (success) { 
+            turn = turn === 'X' ? 'O' : 'X'; 
+            $('.turn').text(`It is ${turn}'s turn.`)
+            toggleButton('Record');
+        //if the input could not be parsed, do nothing
+        } else { 
+            toggleButton('Record');
+        }
     } 
 
     function parse(input) {
-        let row, col = 0;
+        let row = col = 0;
         switch(input) {
             case '1': case '2': case '3': 
             case '4': case '5': case '6': 
@@ -35,48 +50,48 @@ $(document).ready(() => {
                 break;
         }
 
-        if (row === 0 || col === 0) {
-            toggleButton("Click me");
-            return;
-        }
+        if (row === 0) return false; //invalid input
 
         table(row, col, turn);
-        const victor = checkVictory();
-        if (victor.won) {
-            $('.turn').text(victor.winner + ' wins!');
-            $('button').text(victor.winner + ' wins!');
-        } else {            
-            turn = turn === 'X' ? 'O' : 'X'; 
-            $('.turn').text(`It is ${turn}'s turn.`)
-            toggleButton("Click me");
-        }
+        return true;
     }
 
     function checkVictory() {
-        cells = [];
+        let cells = [];
         for (let i = 1; i <= 3; i++) {
             for (let j = 1; j <= 3; j++)
                 cells.push(table(i, j));
         }
+
+        const winConditions = [
+            [0, 1, 2], //row one
+            [3, 4, 5], //row two
+            [6, 7, 8], //row three
+            [0, 3, 6], //column one
+            [1, 4, 7], //column two
+            [2, 5, 8], //column three
+            [0, 4, 8], //main diagonal
+            [2, 4, 6]  //back diagonal
+        ];
         
-        if (cells[0] === cells[1] && cells[1] === cells[2] || //row one
-            cells[3] === cells[4] && cells[4] === cells[5] || //row two
-            cells[6] === cells[7] && cells[7] === cells[8] || //row three
-            cells[0] === cells[3] && cells[3] === cells[6] || //column one
-            cells[1] === cells[4] && cells[4] === cells[7] || //column two
-            cells[2] === cells[5] && cells[5] === cells[8] || //column three
-            cells[0] === cells[4] && cells[4] === cells[8] || //main diagonal
-            cells[2] === cells[4] && cells[4] === cells[6]    //back diagonal
-        ) {
-            return {won: true, winner: turn};
-        } else {
-            return {won: false};
+        for (let i of winConditions) {
+            const [a, b, c] = i;
+            if (cells[a] === cells[b] && cells[a] === cells[c]) 
+                return turn;            
         }
+        return false;
     }
 
     function table(row, col, str) {
         const tableCell = 'table tr:nth-child(' + row + ') td:nth-child(' + col + ')';
-        if (str) $(tableCell).text(str);
+        if (str) { 
+            $(tableCell).text(str);
+            $(tableCell).css({
+                'vertical-align': 'middle',
+                'font-family': 'Impact, Charcoal, sans-serif',
+                'font-size': '6em'
+            });
+        }
         else return $(tableCell).text();
     }
 
